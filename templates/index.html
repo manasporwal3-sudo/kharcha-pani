@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kharcha Paani Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <header class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-amber-400">Kharcha Paani Manager</h1>
+                <p class="text-zinc-400 text-sm">Track every drop of your spending</p>
+            </div>
+            <span class="text-xs text-zinc-500 uppercase tracking-widest">Expense Tracker</span>
+        </header>
+
+        <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8 shadow-lg">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                    <p class="text-zinc-400 text-sm">Total Spent</p>
+                    <p id="totalAmount" class="text-4xl font-extrabold text-emerald-400">₹0.00</p>
+                </div>
+                <div>
+                    <p class="text-zinc-400 text-sm">Entries</p>
+                    <p id="totalCount" class="text-2xl font-bold text-amber-400">0</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8 shadow-lg">
+            <h2 class="text-xl font-semibold text-amber-400 mb-4">Add Expense</h2>
+            <form id="expenseForm" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <input id="title" type="text" placeholder="Title" required
+                    class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                <input id="amount" type="number" step="0.01" min="0.01" placeholder="Amount" required
+                    class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                <select id="category" required
+                    class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <option value="">Category</option>
+                    <option value="Food">Food</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Other">Other</option>
+                </select>
+                <button type="submit"
+                    class="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded-lg px-4 py-2 transition">
+                    Add
+                </button>
+            </form>
+            <p id="formError" class="text-red-400 text-sm mt-3 hidden"></p>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-semibold text-amber-400 mb-4">Recent Expenses</h2>
+            <div id="expenseList" class="space-y-3"></div>
+            <p id="emptyState" class="text-zinc-500 text-center py-10 hidden">No expenses yet. Add your first one above.</p>
+        </section>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
