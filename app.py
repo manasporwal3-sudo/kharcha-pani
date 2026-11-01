@@ -13,7 +13,10 @@ if not firebase_admin._apps:
     try:
         if os.environ.get("FIREBASE_CREDENTIALS"):
             try:
-                cred_dict = json.loads(os.environ.get("FIREBASE_CREDENTIALS"))
+                raw_cred = os.environ.get("FIREBASE_CREDENTIALS")
+                # Fix for escaped newlines in Vercel environment variables
+                raw_cred = raw_cred.replace('\\n', '\n')
+                cred_dict = json.loads(raw_cred)
             except json.JSONDecodeError as e:
                 raise RuntimeError(f"Invalid FIREBASE_CREDENTIALS JSON: {e}")
             cred = credentials.Certificate(cred_dict)
