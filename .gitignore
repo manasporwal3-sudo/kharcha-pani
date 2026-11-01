@@ -1,6 +1,5 @@
 # Secrets
 serviceAccountKey.json
-*.json
 .env
 
 # Python
