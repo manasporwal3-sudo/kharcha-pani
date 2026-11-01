@@ -10,19 +10,26 @@ app = Flask(__name__)
 
 # Initialize Firebase Admin SDK (Vercel + local).
 if not firebase_admin._apps:
-    if os.environ.get("FIREBASE_CREDENTIALS"):
-        try:
-            cred_dict = json.loads(os.environ.get("FIREBASE_CREDENTIALS"))
-        except json.JSONDecodeError as e:
-            raise RuntimeError(f"Invalid FIREBASE_CREDENTIALS JSON: {e}")
-        cred = credentials.Certificate(cred_dict)
-    else:
-        cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-        if cred_path:
-            cred = credentials.Certificate(cred_path)
-        else:
+    try:
+        if os.environ.get("FIREBASE_CREDENTIALS"):
+            try:
+                cred_dict = json.loads(os.environ.get("FIREBASE_CREDENTIALS"))
+            except json.JSONDecodeError as e:
+                raise RuntimeError(f"Invalid FIREBASE_CREDENTIALS JSON: {e}")
+            cred = credentials.Certificate(cred_dict)
+        elif os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+            cred = credentials.Certificate(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
+        elif os.path.exists("serviceAccountKey.json"):
             cred = credentials.Certificate("serviceAccountKey.json")
-    firebase_admin.initialize_app(cred)
+        else:
+            raise RuntimeError(
+                "No Firebase credentials found. Set FIREBASE_CREDENTIALS env var "
+                "(JSON string) or GOOGLE_APPLICATION_CREDENTIALS / serviceAccountKey.json."
+            )
+        firebase_admin.initialize_app(cred)
+    except Exception as e:
+        # Surface a clear error instead of a cryptic 500 on Vercel.
+        raise RuntimeError(f"Firebase initialization failed: {e}") from e
 
 db = firestore.client()
 expenses_collection = db.collection("expenses")
