@@ -28,7 +28,6 @@ if not firebase_admin._apps:
             )
         firebase_admin.initialize_app(cred)
     except Exception as e:
-        # Surface a clear error instead of a cryptic 500 on Vercel.
         raise RuntimeError(f"Firebase initialization failed: {e}") from e
 
 db = firestore.client()
