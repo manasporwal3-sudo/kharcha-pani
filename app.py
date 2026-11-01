@@ -1,5 +1,4 @@
 import os
-import json
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify, render_template, request
@@ -8,30 +7,14 @@ from firebase_admin import credentials, firestore
 
 app = Flask(__name__)
 
-# Initialize Firebase Admin SDK (Vercel + local).
+# Initialize Firebase using the local serviceAccountKey.json file
 if not firebase_admin._apps:
-    try:
-        if os.environ.get("FIREBASE_CREDENTIALS"):
-            try:
-                raw_cred = os.environ.get("FIREBASE_CREDENTIALS")
-                # Fix for escaped newlines in Vercel environment variables
-                raw_cred = raw_cred.replace('\\n', '\n')
-                cred_dict = json.loads(raw_cred)
-            except json.JSONDecodeError as e:
-                raise RuntimeError(f"Invalid FIREBASE_CREDENTIALS JSON: {e}")
-            cred = credentials.Certificate(cred_dict)
-        elif os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
-            cred = credentials.Certificate(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
-        elif os.path.exists("serviceAccountKey.json"):
-            cred = credentials.Certificate("serviceAccountKey.json")
-        else:
-            raise RuntimeError(
-                "No Firebase credentials found. Set FIREBASE_CREDENTIALS env var "
-                "(JSON string) or GOOGLE_APPLICATION_CREDENTIALS / serviceAccountKey.json."
-            )
+    cred_path = "serviceAccountKey.json"
+    if os.path.exists(cred_path):
+        cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
-    except Exception as e:
-        raise RuntimeError(f"Firebase initialization failed: {e}") from e
+    else:
+        raise RuntimeError("serviceAccountKey.json file not found in project directory!")
 
 db = firestore.client()
 expenses_collection = db.collection("expenses")
