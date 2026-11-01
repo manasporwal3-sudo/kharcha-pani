@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify, render_template, request
@@ -7,15 +8,20 @@ from firebase_admin import credentials, firestore
 
 app = Flask(__name__)
 
-# Initialize Firebase Admin SDK.
-# Prefers a service account key via GOOGLE_APPLICATION_CREDENTIALS env var.
-# Falls back to Application Default Credentials if not set.
+# Initialize Firebase Admin SDK (Vercel + local).
 if not firebase_admin._apps:
-    cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-    if cred_path:
-        cred = credentials.Certificate(cred_path)
+    if os.environ.get("FIREBASE_CREDENTIALS"):
+        try:
+            cred_dict = json.loads(os.environ.get("FIREBASE_CREDENTIALS"))
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Invalid FIREBASE_CREDENTIALS JSON: {e}")
+        cred = credentials.Certificate(cred_dict)
     else:
-        cred = credentials.ApplicationDefault()
+        cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+        if cred_path:
+            cred = credentials.Certificate(cred_path)
+        else:
+            cred = credentials.Certificate("serviceAccountKey.json")
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
